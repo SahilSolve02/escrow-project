@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Escrow DApp</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
+  <style>
+    body { font-family: Arial; max-width: 600px; margin: 50px auto; background: #f0f0f0; }
+    .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    h1 { color: #333; text-align: center; }
+    button { width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+    #connectBtn { background: #4CAF50; color: white; }
+    #depositBtn { background: #2196F3; color: white; }
+    #approveBtn { background: #FF9800; color: white; }
+    #status { margin-top: 15px; padding: 10px; background: #e8f5e9; border-radius: 5px; font-size: 14px; word-break: break-all; }
+    .info { font-size: 13px; color: #666; margin: 5px 0; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔒 Escrow DApp</h1>
+    <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+    <div class="info" id="contractInfo">Contract: 0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0</div>
+    <div class="info" id="accountInfo">Account: Not connected</div>
+    <div class="info" id="balanceInfo">Contract Balance: --</div>
+    <hr/>
+    <button id="depositBtn" onclick="deposit()">💰 Deposit 1 ETH</button>
+    <button id="approveBtn" onclick="approve()">✅ Approve (Release to Seller)</button>
+    <div id="status">Status: Waiting...</div>
+  </div>
+
+  <script>
+    const CONTRACT_ADDRESS = "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0";
+    const ABI = [
+      {
+        "inputs": [{"internalType": "address", "name": "_seller", "type": "address"}],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "inputs": [],
+        "name": "deposit",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "approve",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "buyer",
+        "outputs": [{"internalType": "address", "name": "", "type": "address"}],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "seller",
+        "outputs": [{"internalType": "address", "name": "", "type": "address"}],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "isApproved",
+        "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+        "stateMutability": "view",
+        "type": "function"
+      }
+    ];
+
+    let provider, signer, contract;
+
+    async function connectWallet() {
+      if (typeof window.ethereum === 'undefined') {
+        alert("MetaMask not found!");
+        return;
+      }
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      provider = new ethers.BrowserProvider(window.ethereum);
+      signer = await provider.getSigner();
+      contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+      const address = await signer.getAddress();
+      document.getElementById("accountInfo").innerText = "Account: " + address;
+      document.getElementById("status").innerText = "✅ Wallet Connected!";
+      await updateBalance();
+    }
+
+    async function updateBalance() {
+      const bal = await provider.getBalance(CONTRACT_ADDRESS);
+      document.getElementById("balanceInfo").innerText =
+        "Contract Balance: " + ethers.formatEther(bal) + " ETH";
+    }
+
+    async function deposit() {
+      try {
+        document.getElementById("status").innerText = "⏳ Depositing...";
+        const tx = await contract.deposit({ value: ethers.parseEther("1") });
+        await tx.wait();
+        document.getElementById("status").innerText = "✅ Deposit Successful!";
+        await updateBalance();
+      } catch (e) {
+        document.getElementById("status").innerText = "❌ Error: " + e.message;
+      }
+    }
+
+    async function approve() {
+      try {
+        document.getElementById("status").innerText = "⏳ Approving...";
+        const tx = await contract.approve();
+        await tx.wait();
+        document.getElementById("status").innerText = "✅ Approved! Seller received payment.";
+        await updateBalance();
+      } catch (e) {
+        document.getElementById("status").innerText = "❌ Error: " + e.message;
+      }
+    }
+  </script>
+</body>
+</html>
