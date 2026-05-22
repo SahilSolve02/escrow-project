@@ -1,61 +1,194 @@
-<<<<<<< HEAD
-# Sample Hardhat 3 Beta Project (`node:test` and `viem`)
+# 🔒 Escrow Smart Contract DApp
 
-This project showcases a Hardhat 3 Beta project using the native Node.js test runner (`node:test`) and the `viem` library for Ethereum interactions.
+A decentralized Escrow application built on Ethereum blockchain using Hardhat and Solidity.
 
-To learn more about the Hardhat 3 Beta, please visit the [Getting Started guide](https://hardhat.org/docs/getting-started#getting-started-with-hardhat-3). To share your feedback, join our [Hardhat 3 Beta](https://hardhat.org/hardhat3-beta-telegram-group) Telegram group or [open an issue](https://github.com/NomicFoundation/hardhat/issues/new) in our GitHub issue tracker.
+## 📌 What is Escrow?
+An Escrow is a financial arrangement where a third party holds funds on behalf of two parties involved in a transaction. In this project, a **Smart Contract** acts as the escrow — holding ETH from the Buyer and releasing it to the Seller only when the Buyer approves.
 
-## Project Overview
+---
 
-This example project includes:
-
-- A simple Hardhat configuration file.
-- Foundry-compatible Solidity unit tests.
-- TypeScript integration tests using [`node:test`](nodejs.org/api/test.html), the new Node.js native test runner, and [`viem`](https://viem.sh/).
-- Examples demonstrating how to connect to different types of networks, including locally simulating OP mainnet.
-
-## Usage
-
-### Running Tests
-
-To run all the tests in the project, execute the following command:
-
-```shell
-npx hardhat test
+## 🏗️ Project Structure
+```
+Escrow-project/
+├── contracts/
+│   └── Escrow.sol          # Main smart contract
+├── scripts/
+│   ├── deploy.js           # Deployment script
+│   ├── send-op-tx.ts       # Deposit & Approve transaction script
+│   └── frontend/
+│       └── index.html      # Frontend DApp
+├── test/                   # Test files
+├── hardhat.config.js       # Hardhat configuration
+├── package.json            # Project dependencies
+└── README.md               # Project documentation
 ```
 
-You can also selectively run the Solidity or `node:test` tests:
+---
 
-```shell
-npx hardhat test solidity
-npx hardhat test nodejs
+## ⚙️ Technologies Used
+
+| Technology | Purpose |
+|------------|---------|
+| Solidity ^0.8.28 | Smart Contract Language |
+| Hardhat v3 | Ethereum Development Framework |
+| Viem v2 | Ethereum Interaction Library |
+| Node.js | JavaScript Runtime |
+| HTML/CSS/JS | Frontend DApp |
+| MetaMask | Web3 Wallet |
+| ethers.js v6 | Blockchain Interaction |
+
+---
+
+## 📋 Prerequisites
+
+Make sure you have installed:
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- [MetaMask](https://metamask.io/) browser extension
+- [VS Code](https://code.visualstudio.com/)
+- [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) VS Code extension
+
+---
+
+## 🚀 Installation & Setup
+
+### Step 1: Clone the repository
+```bash
+git clone https://github.com/YOUR_USERNAME/escrow-project.git
+cd escrow-project
 ```
 
-### Make a deployment to Sepolia
-
-This project includes an example Ignition module to deploy the contract. You can deploy this module to a locally simulated chain or to Sepolia.
-
-To run the deployment to a local chain:
-
-```shell
-npx hardhat ignition deploy ignition/modules/Counter.ts
+### Step 2: Install dependencies
+```bash
+npm install
 ```
 
-To run the deployment to Sepolia, you need an account with funds to send the transaction. The provided Hardhat configuration includes a Configuration Variable called `SEPOLIA_PRIVATE_KEY`, which you can use to set the private key of the account you want to use.
+---
 
-You can set the `SEPOLIA_PRIVATE_KEY` variable using the `hardhat-keystore` plugin or by setting it as an environment variable.
+## ▶️ Running the Project
 
-To set the `SEPOLIA_PRIVATE_KEY` config variable using `hardhat-keystore`:
+### Step 1: Start local blockchain node
+Open **Terminal 1** and run:
+```bash
+npx hardhat node
+```
+✅ You should see:
+```
+Started HTTP and WebSocket JSON-RPC server at http://127.0.0.1:8545/
+```
+⚠️ **Keep this terminal running!**
 
-```shell
-npx hardhat keystore set SEPOLIA_PRIVATE_KEY
+---
+
+### Step 2: Deploy the smart contract
+Open **Terminal 2** and run:
+```bash
+npx hardhat run scripts/deploy.js --network localhost
+```
+✅ Expected output:
+```
+Deploy started...
+Deployed successfully!
+Contract Address: 0x5fbdb2315678afecb367f032d93f642f64180aa3
 ```
 
-After setting the variable, you can run the deployment with the Sepolia network:
+---
 
-```shell
-npx hardhat ignition deploy --network sepolia ignition/modules/Counter.ts
+### Step 3: Run deposit & approve transaction
+In **Terminal 2** run:
+```bash
+npx hardhat run scripts/send-op-tx.ts --network localhost
 ```
-=======
-# escrow-project
->>>>>>> 56acf0249c14b3f391bd1b745f73f3c1bcb28a3a
+✅ Expected output:
+```
+Buyer: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Seller: 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
+
+--- Depositing 1 ETH ---
+Deposit successful!
+Contract Balance: 1000000000000000000 wei
+
+--- Approving payment to seller ---
+Approved! Seller received payment.
+Contract Balance after approve: 0 wei
+
+✅ Escrow complete!
+```
+
+---
+
+### Step 4: Run the Frontend DApp
+1. Open `scripts/frontend/index.html` in VS Code
+2. Click **"Go Live"** at the bottom status bar
+3. Open Chrome and go to:
+```
+http://127.0.0.1:5500/scripts/frontend/index.html
+```
+
+---
+
+## 🦊 MetaMask Setup
+
+### Add Hardhat Local Network:
+| Field | Value |
+|-------|-------|
+| Network Name | Hardhat Local |
+| RPC URL | http://127.0.0.1:8545 |
+| Chain ID | 31337 |
+| Currency Symbol | ETH |
+
+### Import Test Account:
+Use Account #0 private key from hardhat node output:
+```
+Private Key: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+```
+⚠️ **WARNING: Never use this key on mainnet — it is a public test key!**
+
+---
+
+## 📝 Smart Contract Details
+
+**File:** `contracts/Escrow.sol`
+
+| Function | Description |
+|----------|-------------|
+| `constructor(address _seller)` | Sets buyer (msg.sender) and seller |
+| `deposit()` | Buyer deposits ETH into contract |
+| `approve()` | Buyer approves and releases ETH to seller |
+
+**State Variables:**
+- `buyer` — Address of the buyer
+- `seller` — Address of the seller
+- `isApproved` — Boolean flag for approval status
+
+---
+
+## 🔄 How It Works
+
+```
+Buyer ──── deposit() ────► Smart Contract ──── approve() ────► Seller
+           (1 ETH)            (holds ETH)                      (receives ETH)
+```
+
+1. Buyer deploys contract with seller's address
+2. Buyer calls `deposit()` — sends 1 ETH to contract
+3. Contract holds the ETH securely
+4. Buyer calls `approve()` — ETH is released to seller
+5. Transaction complete ✅
+
+---
+
+## 🎯 Conclusion
+
+This project successfully demonstrates a **decentralized escrow system** on Ethereum blockchain. The smart contract eliminates the need for a trusted third party, providing a secure, transparent, and trustless way to handle financial transactions between two parties.
+
+---
+
+## 👨‍💻 Author
+
+**Sahil Raghatate**
+
+---
+
+## 📄 License
+
+MIT License
